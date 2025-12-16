@@ -26,11 +26,12 @@ class InitMQTTClient:
         self.mqttPass = os.getenv('MQTT_PASS')
         self.deviceId = os.getenv('DEVICE_ID')
         self.clientMqttId = f"vehicle-count-{self.deviceId}-client"
+        self.loop_running = False
         self.subscribeTopic = [
             f"carcamera/subscribe/{self.deviceId}",
             f"carcamera/{self.deviceId}/screenshoot",
         ]
-        
+
         self.client = mqtt.Client(
             transport='tcp',
             client_id=self.clientMqttId,
