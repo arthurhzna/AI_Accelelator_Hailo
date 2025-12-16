@@ -1,4 +1,4 @@
-## Vehicle Counting & Impression Collector
+## Object Counting & Impression Collector
 
 This repository contains scripts to count objects crossing configured lines in a video/stream, store impressions in a local SQLite database, and transmit counts via MQTT. It also supports uploading screenshots to an HTTP endpoint when requested.
 
@@ -122,4 +122,5 @@ The app will create/connect to the SQLite database (default `count.db`) and star
 ## License
 
 Choose a license that suits your needs and add a `LICENSE` file for public distribution.
+
 
