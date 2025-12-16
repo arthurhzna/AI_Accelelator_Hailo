@@ -132,10 +132,10 @@ class user_app_callback_class(app_callback_class):
         
         self.http_client = InitHTTPClient()
 
-        self.update_counter_with_class(self.last_data_count, self)
+        self.update_counter_with_class(self)
 
     @staticmethod
-    def update_counter_with_class(load_data, user_data):
+    def update_counter_with_class(user_data):
         yolo_classes = {
             "0": "person", "1": "bicycle", "2": "car", "3": "motorcycle", "4": "airplane",
             "5": "bus", "6": "train", "7": "truck", "8": "boat", "9": "traffic light",
@@ -157,24 +157,24 @@ class user_app_callback_class(app_callback_class):
             "79": "toothbrush"
         }
 
-        if not load_data:
+        if not user_data.load_data:
             return
 
-        if 'RB' in load_data:
+        if 'RB' in user_data.load_data:
             for line_num in range(len(user_data.line_value)):
                 line_key = f"line{line_num + 1}"
-                if line_key in load_data['RB']:
-                    for class_id, count in load_data['RB'][line_key].items():
+                if line_key in user_data.load_data['RB']:
+                    for class_id, count in user_data.load_data['RB'][line_key].items():
                         if count > 0 and class_id in yolo_classes:  
                             class_name = yolo_classes[class_id]  
                             user_data.object_counter_RB[line_num][class_name] = count
 
     
-        if 'BR' in load_data:
+        if 'BR' in user_data.load_data:
             for line_num in range(len(user_data.line_value)):
                 line_key = f"line{line_num + 1}"
-                if line_key in load_data['BR']:
-                    for class_id, count in load_data['BR'][line_key].items():
+                if line_key in user_data.load_data['BR']:
+                    for class_id, count in user_data.load_data['BR'][line_key].items():
                         if count > 0 and class_id in yolo_classes:  
                             class_name = yolo_classes[class_id]  
                             user_data.object_counter_BR[line_num][class_name] = count
@@ -723,8 +723,6 @@ def app_callback(pad, info, user_data):
     if user_data.use_frame and format is not None and width is not None and height is not None:
     
         frame = get_numpy_from_buffer(buffer, format, width, height)
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        user_data.set_frame(frame)
         frame_line_count = frame.copy()
         frame_line_count = cv2.cvtColor(frame_line_count, cv2.COLOR_RGB2BGR)
 
@@ -804,6 +802,11 @@ def app_callback(pad, info, user_data):
         user_data.image_screenshot_count["flag"] = False
 
     user_app_callback_class.save_last_data_count_to_json(user_data)
+
+    if user_data.use_frame:
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        user_data.set_frame(frame)
 
     return Gst.PadProbeReturn.OK
 
