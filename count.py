@@ -53,6 +53,29 @@ class user_app_callback_class(app_callback_class):
         self.object_counter_RB = defaultdict(lambda: defaultdict(int))
         self.object_counter_BR = defaultdict(lambda: defaultdict(int))
 
+        self.id_type_to_class_name_coco = {
+            "0": "person", "1": "bicycle", "2": "car", "3": "motorcycle", "4": "airplane",
+            "5": "bus", "6": "train", "7": "truck", "8": "boat", "9": "traffic light",
+            "10": "fire hydrant", "11": "stop sign", "12": "parking meter", "13": "bench",
+            "14": "bird", "15": "cat", "16": "dog", "17": "horse", "18": "sheep", "19": "cow",
+            "20": "elephant", "21": "bear", "22": "zebra", "23": "giraffe", "24": "backpack",
+            "25": "umbrella", "26": "handbag", "27": "tie", "28": "suitcase", "29": "frisbee",
+            "30": "skis", "31": "snowboard", "32": "sports ball", "33": "kite",
+            "34": "baseball bat", "35": "baseball glove", "36": "skateboard", "37": "surfboard",
+            "38": "tennis racket", "39": "bottle", "40": "wine glass", "41": "cup",
+            "42": "fork", "43": "knife", "44": "spoon", "45": "bowl", "46": "banana",
+            "47": "apple", "48": "sandwich", "49": "orange", "50": "broccoli", "51": "carrot",
+            "52": "hot dog", "53": "pizza", "54": "donut", "55": "cake", "56": "chair",
+            "57": "couch", "58": "potted plant", "59": "bed", "60": "dining table",
+            "61": "toilet", "62": "tv", "63": "laptop", "64": "mouse", "65": "remote",
+            "66": "keyboard", "67": "cell phone", "68": "microwave", "69": "oven",
+            "70": "toaster", "71": "sink", "72": "refrigerator", "73": "book", "74": "clock",
+            "75": "vase", "76": "scissors", "77": "teddy bear", "78": "hair drier",
+            "79": "toothbrush"
+        }
+
+        self.class_name_to_id_type_coco = {v: k for k, v in self.id_type_to_class_name_coco.items()}
+
         self.time_send_every_15_minutes = set()
         self.time_send_every_1_minutes = set()
         self.time_send_every_1_hour = set()
@@ -74,7 +97,6 @@ class user_app_callback_class(app_callback_class):
 
         self.current_day = None
         self.last_day = None
-
 
         for hour in range(24): 
             # for minute in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]: 
@@ -127,8 +149,7 @@ class user_app_callback_class(app_callback_class):
 
         self.unacked_publish = set()
 
-        self.mqtt_client = InitMQTTClient(self.db, self.device_status, self.line_value, self.region_line, self.class_active,
-                                           self.image_screenshot_count, self.unacked_publish)
+        self.mqtt_client = InitMQTTClient(self)
         
         self.http_client = InitHTTPClient()
 
@@ -136,26 +157,6 @@ class user_app_callback_class(app_callback_class):
 
     @staticmethod
     def update_counter_with_class(user_data):
-        yolo_classes = {
-            "0": "person", "1": "bicycle", "2": "car", "3": "motorcycle", "4": "airplane",
-            "5": "bus", "6": "train", "7": "truck", "8": "boat", "9": "traffic light",
-            "10": "fire hydrant", "11": "stop sign", "12": "parking meter", "13": "bench",
-            "14": "bird", "15": "cat", "16": "dog", "17": "horse", "18": "sheep", "19": "cow",
-            "20": "elephant", "21": "bear", "22": "zebra", "23": "giraffe", "24": "backpack",
-            "25": "umbrella", "26": "handbag", "27": "tie", "28": "suitcase", "29": "frisbee",
-            "30": "skis", "31": "snowboard", "32": "sports ball", "33": "kite",
-            "34": "baseball bat", "35": "baseball glove", "36": "skateboard", "37": "surfboard",
-            "38": "tennis racket", "39": "bottle", "40": "wine glass", "41": "cup",
-            "42": "fork", "43": "knife", "44": "spoon", "45": "bowl", "46": "banana",
-            "47": "apple", "48": "sandwich", "49": "orange", "50": "broccoli", "51": "carrot",
-            "52": "hot dog", "53": "pizza", "54": "donut", "55": "cake", "56": "chair",
-            "57": "couch", "58": "potted plant", "59": "bed", "60": "dining table",
-            "61": "toilet", "62": "tv", "63": "laptop", "64": "mouse", "65": "remote",
-            "66": "keyboard", "67": "cell phone", "68": "microwave", "69": "oven",
-            "70": "toaster", "71": "sink", "72": "refrigerator", "73": "book", "74": "clock",
-            "75": "vase", "76": "scissors", "77": "teddy bear", "78": "hair drier",
-            "79": "toothbrush"
-        }
 
         if not user_data.load_data:
             return
@@ -165,18 +166,17 @@ class user_app_callback_class(app_callback_class):
                 line_key = f"line{line_num + 1}"
                 if line_key in user_data.load_data['RB']:
                     for class_id, count in user_data.load_data['RB'][line_key].items():
-                        if count > 0 and class_id in yolo_classes:  
-                            class_name = yolo_classes[class_id]  
+                        if count > 0 and class_id in user_data.id_type_to_class_name_coco:  
+                            class_name = user_data.id_type_to_class_name_coco[class_id]  
                             user_data.object_counter_RB[line_num][class_name] = count
-
     
         if 'BR' in user_data.load_data:
             for line_num in range(len(user_data.line_value)):
                 line_key = f"line{line_num + 1}"
                 if line_key in user_data.load_data['BR']:
                     for class_id, count in user_data.load_data['BR'][line_key].items():
-                        if count > 0 and class_id in yolo_classes:  
-                            class_name = yolo_classes[class_id]  
+                        if count > 0 and class_id in user_data.id_type_to_class_name_coco:  
+                            class_name = user_data.id_type_to_class_name_coco[class_id]  
                             user_data.object_counter_BR[line_num][class_name] = count
 
     @staticmethod
@@ -207,38 +207,40 @@ class user_app_callback_class(app_callback_class):
             print("Error saat publish:", e)
             return False
 
+    # @staticmethod
+    # def load_data_from_json_file(filename):
+    #     try:
+    #         with open(filename, 'r') as file:
+    #             data = json.load(file)
+    #         return data
+    #     except FileNotFoundError:
+    #         print("No saved data found. Starting fresh.")
+    #         return None
+
     @staticmethod
     def load_data_from_json_file(filename):
         try:
+            if not os.path.exists(filename):
+                print("JSON file not found. Starting fresh.")
+                return None
+
+            if os.path.getsize(filename) == 0:
+                print("JSON file is empty. Starting fresh.")
+                return None
+
             with open(filename, 'r') as file:
-                data = json.load(file)
-            return data
-        except FileNotFoundError:
-            print("No saved data found. Starting fresh.")
+                return json.load(file)
+
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON format: {e}. Starting fresh.")
+            return None
+
+        except Exception as e:
+            print(f"Unexpected error while loading JSON: {e}")
             return None
         
     @staticmethod
     def save_last_data_count_to_json(user_data):
-        yolo_classes = {
-            "person": "0", "bicycle": "1", "car": "2", "motorcycle": "3", "airplane": "4",
-            "bus": "5", "train": "6", "truck": "7", "boat": "8", "traffic light": "9",
-            "fire hydrant": "10", "stop sign": "11", "parking meter": "12", "bench": "13",
-            "bird": "14", "cat": "15", "dog": "16", "horse": "17", "sheep": "18", "cow": "19",
-            "elephant": "20", "bear": "21", "zebra": "22", "giraffe": "23", "backpack": "24",
-            "umbrella": "25", "handbag": "26", "tie": "27", "suitcase": "28", "frisbee": "29",
-            "skis": "30", "snowboard": "31", "sports ball": "32", "kite": "33",
-            "baseball bat": "34", "baseball glove": "35", "skateboard": "36", "surfboard": "37",
-            "tennis racket": "38", "bottle": "39", "wine glass": "40", "cup": "41",
-            "fork": "42", "knife": "43", "spoon": "44", "bowl": "45", "banana": "46",
-            "apple": "47", "sandwich": "48", "orange": "49", "broccoli": "50", "carrot": "51",
-            "hot dog": "52", "pizza": "53", "donut": "54", "cake": "55", "chair": "56",
-            "couch": "57", "potted plant": "58", "bed": "59", "dining table": "60",
-            "toilet": "61", "tv": "62", "laptop": "63", "mouse": "64", "remote": "65",
-            "keyboard": "66", "cell phone": "67", "microwave": "68", "oven": "69",
-            "toaster": "70", "sink": "71", "refrigerator": "72", "book": "73", "clock": "74",
-            "vase": "75", "scissors": "76", "teddy bear": "77", "hair drier": "78",
-            "toothbrush": "79"
-        }
         
         data = {
             "RB": {},
@@ -256,13 +258,13 @@ class user_app_callback_class(app_callback_class):
             
             if line_num in user_data.object_counter_RB:
                 for class_name, count in user_data.object_counter_RB[line_num].items():
-                    class_id = yolo_classes.get(class_name)
+                    class_id = user_data.class_name_to_id_type_coco.get(class_name)
                     if class_id:
                         data["RB"][line_key][class_id] = count
             
             if line_num in user_data.object_counter_BR:
                 for class_name, count in user_data.object_counter_BR[line_num].items():
-                    class_id = yolo_classes.get(class_name)
+                    class_id = user_data.class_name_to_id_type_coco.get(class_name)
                     if class_id:
                         data["BR"][line_key][class_id] = count
         
@@ -393,26 +395,6 @@ class user_app_callback_class(app_callback_class):
     
     @staticmethod
     def parsing_imp_data_line_count(user_data):
-        yolo_classes = {
-            "person": "0", "bicycle": "1", "car": "2", "motorcycle": "3", "airplane": "4",
-            "bus": "5", "train": "6", "truck": "7", "boat": "8", "traffic light": "9",
-            "fire hydrant": "10", "stop sign": "11", "parking meter": "12", "bench": "13",
-            "bird": "14", "cat": "15", "dog": "16", "horse": "17", "sheep": "18", "cow": "19",
-            "elephant": "20", "bear": "21", "zebra": "22", "giraffe": "23", "backpack": "24",
-            "umbrella": "25", "handbag": "26", "tie": "27", "suitcase": "28", "frisbee": "29",
-            "skis": "30", "snowboard": "31", "sports ball": "32", "kite": "33",
-            "baseball bat": "34", "baseball glove": "35", "skateboard": "36", "surfboard": "37",
-            "tennis racket": "38", "bottle": "39", "wine glass": "40", "cup": "41",
-            "fork": "42", "knife": "43", "spoon": "44", "bowl": "45", "banana": "46",
-            "apple": "47", "sandwich": "48", "orange": "49", "broccoli": "50", "carrot": "51",
-            "hot dog": "52", "pizza": "53", "donut": "54", "cake": "55", "chair": "56",
-            "couch": "57", "potted plant": "58", "bed": "59", "dining table": "60",
-            "toilet": "61", "tv": "62", "laptop": "63", "mouse": "64", "remote": "65",
-            "keyboard": "66", "cell phone": "67", "microwave": "68", "oven": "69",
-            "toaster": "70", "sink": "71", "refrigerator": "72", "book": "73", "clock": "74",
-            "vase": "75", "scissors": "76", "teddy bear": "77", "hair drier": "78",
-            "toothbrush": "79"
-        }
 
         lines_data = []
 
@@ -427,7 +409,7 @@ class user_app_callback_class(app_callback_class):
                 all_classes.update(user_data.object_counter_BR[line].keys())
             
             for class_name in all_classes:
-                type_id = yolo_classes.get(class_name, "unknown")
+                type_id = user_data.class_name_to_id_type_coco.get(class_name, "unknown")
                 rb_count = user_data.object_counter_RB[line].get(class_name, 0)
                 br_count = user_data.object_counter_BR[line].get(class_name, 0)
                 
@@ -661,7 +643,7 @@ class user_app_callback_class(app_callback_class):
 
         sorted_points = sorted(points, key=angle_from_center, reverse=True)
         return sorted_points
-
+    
     @staticmethod
     def is_point_in_square(square_points, point):
         square_points = user_app_callback_class.sort_points_clockwise(square_points)
@@ -812,4 +794,3 @@ if __name__ == "__main__":
     user_data = user_app_callback_class()
     app = GStreamerDetectionApp(app_callback, user_data)
     app.run()
-
