@@ -661,7 +661,8 @@ class user_app_callback_class(app_callback_class):
 
         sorted_points = sorted(points, key=angle_from_center, reverse=True)
         return sorted_points
-    
+
+    @staticmethod
     def is_point_in_square(square_points, point):
         square_points = user_app_callback_class.sort_points_clockwise(square_points)
         A, B, C, D = square_points
@@ -811,3 +812,4 @@ if __name__ == "__main__":
     user_data = user_app_callback_class()
     app = GStreamerDetectionApp(app_callback, user_data)
     app.run()
+
