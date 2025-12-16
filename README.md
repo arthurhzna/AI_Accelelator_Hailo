@@ -29,14 +29,6 @@ This repository contains scripts to count objects crossing configured lines in a
 
 ---
 
-## Requirements
-
-- Python 3.8 or newer
-- Recommended packages: `numpy`, `opencv-python`, `paho-mqtt`, `python-dotenv`, `requests`, `certifi`
-- Additional external dependencies may be required depending on the detection pipeline implementation.
-
----
-
 ## Configuration (.env)
 
 Place the `.env` file under `basic_pipelines/.env` (this path is used by the scripts).
@@ -52,39 +44,6 @@ AUTHORIZATION_TOKEN=Bearer <token>      # used for screenshot upload authorizati
 ```
 
 Note: ensure your MQTT broker supports the type of connection you intend to use (TCP or WebSocket).
-
----
-
-## MQTT topics (summary)
-
-- Publish events / counts: `carcamera/publish`
-- Subscribe for configuration & registration: `carcamera/subscribe/{DEVICE_ID}`
-- Subscribe for screenshot request: `carcamera/{DEVICE_ID}/screenshoot`
-- Configuration topic: `carcamera/config/{DEVICE_ID}` (for class changes)
-
-JSON payloads follow action patterns such as `send_data_count`, `new_carcamera`, `device_status`, etc.
-
----
-
-## Running the application
-
-1. Create and activate a virtual environment and install dependencies:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # or .venv\\Scripts\\activate on Windows
-pip install -r requirements.txt   # create this file if not present
-```
-
-2. Edit `basic_pipelines/.env` and set required variables.
-
-3. Start the application:
-
-```bash
-python count.py
-```
-
-The app will create/connect to the SQLite database (default `count.db`) and start the detection loop and MQTT client.
 
 ---
 
@@ -111,6 +70,7 @@ The app will create/connect to the SQLite database (default `count.db`) and star
 - Screenshot upload failures: verify `AUTHORIZATION_TOKEN` and the `url` provided in MQTT payloads.
 
 ---
+
 
 
 
