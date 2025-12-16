@@ -29,8 +29,8 @@ class InitMQTTClient:
         self.clientMqttId = f"vehicle-count-{self.deviceId}-client"
         self.loop_running = False
         self.subscribeTopic = [
-            f"carcamera/subscribe/{self.deviceId}",
-            f"carcamera/{self.deviceId}/screenshoot",
+            f"your-topic/subscribe/{self.deviceId}",
+            f"your-topic/{self.deviceId}/screenshoot",
         ]
 
         self.client = mqtt.Client(
@@ -183,5 +183,6 @@ class InitMQTTClient:
         except Exception as e:
             # print(f"Warning: Error in on_publish callback: {e}")
             logger.warning(f"Warning: Error in on_publish callback: {e}")
+
 
 
