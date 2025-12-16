@@ -11,14 +11,12 @@ class InitDatabase:
         self.db_lock = threading.Lock()
         
     def connect(self):
-        """Koneksi ke database"""
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False, timeout=30)
         self.conn.execute('PRAGMA journal_mode = WAL;')
         self.cursor = self.conn.cursor()
         return self.conn
     
     def close(self):
-        """Tutup koneksi database"""
         if self.conn:
             self.conn.close()
     
@@ -326,4 +324,5 @@ class InitDatabase:
                 raise
             finally:
                 cur.close()
+
 
