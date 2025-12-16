@@ -3,7 +3,7 @@ Description=AI_Accelelator_Hailo
 After=graphical.target
 
 [Service]
-User=inovasi
+User={user}
 Environment="DISPLAY=:0"
 Environment="XDG_RUNTIME_DIR=/run/user/1000"
 WorkingDirectory={your-path}
