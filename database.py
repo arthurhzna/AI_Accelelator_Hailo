@@ -282,9 +282,9 @@ class InitDatabase:
             finally:
                 cur.close()
 
-    def insert_multiple_classes(self,user_data, class_id_list):
+    def insert_multiple_classes(self,id_type_to_class_name_coco, class_id_list):
         for class_id in class_id_list:
-            class_name = user_data.id_type_to_class_name_coco.get(class_id)
+            class_name = id_type_to_class_name_coco.get(class_id)
             if class_name:
                 self.insert_class_detection(class_id, class_name)
             else:

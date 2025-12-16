@@ -12,14 +12,15 @@ logger = logging.getLogger("hailo_count")
 load_dotenv("basic_pipelines/.env", override=True) 
 
 class InitMQTTClient:
-    def __init__(self, db, device_status, line_value, region_line, class_active, image_screenshot_count, unacked_publish):
-        self.db = db
-        self.device_status = device_status
-        self.line_value = line_value
-        self.region_line = region_line
-        self.class_active = class_active
-        self.image_screenshot_count = image_screenshot_count
-        self.unacked_publish = unacked_publish
+    def __init__(self, user_data):
+        self.db = user_data.db
+        self.device_status = user_data.device_status
+        self.line_value = user_data.line_value
+        self.region_line = user_data.region_line
+        self.class_active = user_data.class_active
+        self.image_screenshot_count = user_data.image_screenshot_count
+        self.unacked_publish = user_data.unacked_publish
+        self.id_type_to_class_name_coco = user_data.id_type_to_class_name_coco
         self.mqttBroker = os.getenv('MQTT_BROKER')
         self.mqttPort = int(os.getenv('MQTT_PORT'))
         self.mqttUser = os.getenv('MQTT_USER')
@@ -134,7 +135,7 @@ class InitMQTTClient:
 
                 if 'type_code' in payload:
                     self.db.clear_all_classes()
-                    self.db.insert_multiple_classes(payload['type_code'])
+                    self.db.insert_multiple_classes(self, payload['type_code'])
                     self.class_active.clear()
                     self.class_active.extend(self.db.get_all_class_names())
 
@@ -172,7 +173,7 @@ class InitMQTTClient:
                 # print(f"Received carcamera_config_type action with data: {payload['type_code']}")
                 logger.info(f"Received carcamera_config_type action with data: {payload['type_code']}")
                 self.db.clear_all_classes()
-                self.db.insert_multiple_classes(payload['type_code'])
+                self.db.insert_multiple_classes(user_data, payload['type_code'])
                 self.class_active.clear()
                 self.class_active.extend(self.db.get_all_class_names())
 
