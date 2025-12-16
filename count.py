@@ -351,8 +351,7 @@ class user_app_callback_class(app_callback_class):
                     cv2.putText(img_count, blue_text, (blue_x, mid_y_2), 
                             font, font_scale, (255, 0, 0), thickness)
                     cv2.putText(img_count, red_text, (red_x, mid_y_1), 
-                            font, font_scale, (0, 0, 255), thickness)
-                    
+                            font, font_scale, (0, 0, 255), thickness) 
           
                 m_list.append(m)
                 c_list.append(c)
@@ -449,10 +448,6 @@ class user_app_callback_class(app_callback_class):
     
     @staticmethod
     def save_data_line_count_to_db(user_data, lines_data, timestamp=None, is_send=0):
-        """
-        Menyimpan data line count ke database
-        lines_data: data yang sudah diparsing dari parsing_imp_data_line_count
-        """
         if timestamp is None:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -723,6 +718,8 @@ def app_callback(pad, info, user_data):
     if user_data.use_frame and format is not None and width is not None and height is not None:
     
         frame = get_numpy_from_buffer(buffer, format, width, height)
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        user_data.set_frame(frame)
         frame_line_count = frame.copy()
         frame_line_count = cv2.cvtColor(frame_line_count, cv2.COLOR_RGB2BGR)
 
@@ -802,11 +799,6 @@ def app_callback(pad, info, user_data):
         user_data.image_screenshot_count["flag"] = False
 
     user_app_callback_class.save_last_data_count_to_json(user_data)
-
-    if user_data.use_frame:
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        user_data.set_frame(frame)
 
     return Gst.PadProbeReturn.OK
 
