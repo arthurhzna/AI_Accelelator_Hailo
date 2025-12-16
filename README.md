@@ -112,15 +112,6 @@ The app will create/connect to the SQLite database (default `count.db`) and star
 
 ---
 
-## Development & contributions
 
-- Keep existing separation of concerns: MQTT logic in `mqtt_client.py`, HTTP upload logic in `http_client.py`, and storage logic in `database.py`.
-- Consider adding unit tests for `parsing_imp_data_line_count` and core counting logic.
-
----
-
-## License
-
-Choose a license that suits your needs and add a `LICENSE` file for public distribution.
 
 
