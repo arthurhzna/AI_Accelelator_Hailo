@@ -4,7 +4,7 @@ from datetime import datetime
 import threading
 
 class InitDatabase:
-    def __init__(self, db_path='counter.db'):
+    def __init__(self, db_path='count.db'):
         self.db_path = db_path
         self.conn = None
         self.cursor = None
@@ -326,3 +326,4 @@ class InitDatabase:
                 raise
             finally:
                 cur.close()
+
