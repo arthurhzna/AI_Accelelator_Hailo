@@ -126,8 +126,8 @@ class InitMQTTClient:
         payload = json.loads(message.payload.decode())
         topic = message.topic
         logger.info(f"Received message from topic: {topic}")
-        if topic == f"carcamera/subscribe/{self.deviceId}": 
-            if payload.get("action") == "carcamera_registered":
+        if topic == f"your-topic/subscribe/{self.deviceId}": 
+            if payload.get("action") == "your-topic_registered":
                 # print(f"    Camera registered: ID={payload['id']}, Connection={payload['connection']}, Name={payload['name']}")
                 logger.info(f"Camera registered: ID={payload['id']}, Connection={payload['connection']}, Name={payload['name']}")
                 self.device_status["is_registered"] = True
@@ -161,17 +161,17 @@ class InitMQTTClient:
                 time.sleep(1)
                 self.image_screenshot_count['flag'] = True   
         
-        elif topic == f"carcamera/{self.deviceId}/screenshoot":
+        elif topic == f"your-topic/{self.deviceId}/screenshoot":
             # print(f"Camera Screenshoot Count: ID={payload['id']}, Url={payload['url']}")
             logger.info(f"Camera Screenshoot Count: ID={payload['id']}, Url={payload['url']}")
             self.image_screenshot_count['url'] = payload['url']      
             time.sleep(1)
             self.image_screenshot_count['flag'] = True
 
-        elif topic == f"carcamera/config/{self.deviceId}": 
-            if payload.get("action") == "carcamera_config_type":
-                # print(f"Received carcamera_config_type action with data: {payload['type_code']}")
-                logger.info(f"Received carcamera_config_type action with data: {payload['type_code']}")
+        elif topic == f"your-topic/config/{self.deviceId}": 
+            if payload.get("action") == "your-topic_config_type":
+                # print(f"Received your-topic_config_type action with data: {payload['type_code']}")
+                logger.info(f"Received your-topic_config_type action with data: {payload['type_code']}")
                 self.db.clear_all_classes()
                 self.db.insert_multiple_classes(user_data, payload['type_code'])
                 self.class_active.clear()
@@ -183,6 +183,7 @@ class InitMQTTClient:
         except Exception as e:
             # print(f"Warning: Error in on_publish callback: {e}")
             logger.warning(f"Warning: Error in on_publish callback: {e}")
+
 
 
 
