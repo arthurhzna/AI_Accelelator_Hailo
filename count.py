@@ -723,6 +723,8 @@ def app_callback(pad, info, user_data):
     if user_data.use_frame and format is not None and width is not None and height is not None:
     
         frame = get_numpy_from_buffer(buffer, format, width, height)
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        user_data.set_frame(frame)
         frame_line_count = frame.copy()
         frame_line_count = cv2.cvtColor(frame_line_count, cv2.COLOR_RGB2BGR)
 
@@ -802,11 +804,6 @@ def app_callback(pad, info, user_data):
         user_data.image_screenshot_count["flag"] = False
 
     user_app_callback_class.save_last_data_count_to_json(user_data)
-
-    if user_data.use_frame:
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        user_data.set_frame(frame)
 
     return Gst.PadProbeReturn.OK
 
