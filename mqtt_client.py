@@ -109,7 +109,6 @@ class InitMQTTClient:
                 else: 
                     # print("Reconnection failed. Retrying...") 
                     logger.info("Reconnection failed. Retrying...")
-                    # user_app_callback_class.write_log(self.log_path, "Reconnection failed. Retrying...")
             time.sleep(10) 
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
@@ -183,6 +182,7 @@ class InitMQTTClient:
         except Exception as e:
             # print(f"Warning: Error in on_publish callback: {e}")
             logger.warning(f"Warning: Error in on_publish callback: {e}")
+
 
 
 
